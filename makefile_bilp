@@ -1,0 +1,96 @@
+SYSTEM     = x86-64_osx
+LIBFORMAT  = static_pic
+
+#------------------------------------------------------------
+#
+# When you adapt this makefile to compile your CPLEX programs
+# please copy this makefile and set CPLEXDIR and CONCERTDIR to
+# the directories where CPLEX and CONCERT are installed.
+#
+#------------------------------------------------------------
+
+#CPLEXDIR      = ../../..
+#CONCERTDIR    = ../../../../concert
+CPLEXDIR      = /Applications/CPLEX_Studio_Community129/cplex
+CONCERTDIR    = /Applications/CPLEX_Studio_Community129/concert
+
+# ---------------------------------------------------------------------
+# Compiler selection 
+# ---------------------------------------------------------------------
+
+CCC = clang++ -O0
+CC  = clang -O0
+
+# ---------------------------------------------------------------------
+# Compiler options 
+# ---------------------------------------------------------------------
+
+CCOPT = -m64 -O -fPIC -fexceptions -DNDEBUG -DIL_STD -stdlib=libc++
+COPT  = -m64 -fPIC
+
+# ---------------------------------------------------------------------
+# Link options and libraries
+# ---------------------------------------------------------------------
+
+CPLEXBINDIR   = $(CPLEXDIR)/bin/$(BINDIST)
+CPLEXLIBDIR   = $(CPLEXDIR)/lib/$(SYSTEM)/$(LIBFORMAT)
+CONCERTLIBDIR = $(CONCERTDIR)/lib/$(SYSTEM)/$(LIBFORMAT)
+
+# For dynamic linking
+CPLEXBINDIR   = $(CPLEXDIR)/bin/$(SYSTEM)
+CPLEXLIB      = cplex$(dynamic:yes=1290)
+run           = $(dynamic:yes=DYLD_LIBRARY_PATH=$(CPLEXBINDIR))
+
+CCLNDIRS  = -L$(CPLEXLIBDIR) -L$(CONCERTLIBDIR) $(dynamic:yes=-L$(CPLEXBINDIR))
+CLNDIRS   = -L$(CPLEXLIBDIR) $(dynamic:yes=-L$(CPLEXBINDIR))
+CCLNFLAGS = -lconcert -lilocplex -l$(CPLEXLIB) -m64 -lm -lpthread -framework CoreFoundation -framework IOKit -stdlib=libc++
+CLNFLAGS  = -l$(CPLEXLIB) -m64 -lm -lpthread -framework CoreFoundation -framework IOKit
+
+
+all:
+	make all_cpp
+
+CONCERTINCDIR = $(CONCERTDIR)/include
+CPLEXINCDIR   = $(CPLEXDIR)/include
+
+EXDIR         = $(CPLEXDIR)/examples
+EXINC         = $(EXDIR)/include
+EXDATA        = $(EXDIR)/data
+EXSRCCPP      = $(EXDIR)/src/cpp
+
+CCFLAGS = $(CCOPT) -I$(CPLEXINCDIR) -I$(CONCERTINCDIR)
+
+
+#------------------------------------------------------------
+#  make all      : to compile the examples. 
+#  make execute  : to compile and execute the examples.
+#------------------------------------------------------------
+
+#CPP_EX = generate_tasks
+
+all_cpp: pfp_test_BILP
+
+# ------------------------------------------------------------
+
+clean :
+	/bin/rm -rf *.o *~ *.class
+	/bin/rm -rf $(CPP_EX)
+
+# ------------------------------------------------------------
+#
+# The examples
+#
+#pfp_test_BILP: $(EXSRCCPP)/pfp_test_BILP.o $(EXSRCCPP)/custom_types/ts.o
+#		$(CCC) -c $(CCFLAGS) -o pfp_test_BILP $(EXSRCCPP)/pfp_test_BILP.o $(EXSRCCPP)/custom_types/ts.o
+
+
+pfp_test_BILP: pfp_test_BILP.o ts.o
+	$(CCC) $(CCFLAGS) $(CCLNDIRS) -o pfp_test_BILP pfp_test_BILP.o ts.o $(CCLNFLAGS)
+pfp_test_BILP.o: pfp_test_BILP.cpp
+	$(CCC) -c $(CCFLAGS) -o pfp_test_BILP.o pfp_test_BILP.cpp
+ts.o: $(EXSRCCPP)/custom_types/ts.cpp
+	$(CCC) -c $(CCFLAGS) -o ts.o custom_types/ts.cpp
+
+# Local Variables:
+# mode: makefile
+# End:
