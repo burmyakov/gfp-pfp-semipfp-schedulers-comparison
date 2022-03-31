@@ -11,30 +11,30 @@ const unsigned short PROC_NUM = 2;
 
 struct state {
     //TS& tsLocal;
-    uint_fast8_t n; // tasks number
-    uint_fast8_t* c; // remaining execution time
-    uint_fast8_t* p; // time to next period
-    uint_fast8_t* timePassedFromLastRelease;
-    uint_fast8_t* wrts;
+    unsigned short n; // tasks number
+    unsigned short* c; // remaining execution time
+    unsigned short* p; // time to next period
+    unsigned short* timePassedFromLastRelease;
+    unsigned short* wrts;
     bool* firstJobReleased;
     //bool* releaseAtEarliest;
     bool* interferred; // interference flags
     bool* jobCanBeReleasedBefore;
     bool* processorAvailableForTau_i;
     bool* prevState_processorAvailableForTau_i;
-    uint_fast8_t pendJobsNum;
-    uint_fast8_t lockedJobsNum;
-    uint_fast8_t sumCs;
+    unsigned short pendJobsNum;
+    unsigned short lockedJobsNum;
+    unsigned short sumCs;
     bool* tauI_jobJustCompleted;
     int_fast8_t* tauI_releaseNextJobBefore;
     
     // constructor 1
     //state(TS& _ts): tsLocal(_ts) {
-    state(const uint_fast8_t _n): n(_n) {
-        c = new uint_fast8_t[n];
-        p = new uint_fast8_t[n];
-        timePassedFromLastRelease = new uint_fast8_t[n];
-        wrts = new uint_fast8_t[n];
+    state(const unsigned short _n): n(_n) {
+        c = new unsigned short[n];
+        p = new unsigned short[n];
+        timePassedFromLastRelease = new unsigned short[n];
+        wrts = new unsigned short[n];
         firstJobReleased = new bool[n];
         //releaseAtEarliest = new bool[n];
         for (int i = 0; i < n; i++) c[i] = p[i] = timePassedFromLastRelease[i] = wrts[i] = 0;
@@ -44,7 +44,7 @@ struct state {
         jobCanBeReleasedBefore = new bool[n];
         processorAvailableForTau_i = new bool[n];
         prevState_processorAvailableForTau_i = new bool[n];
-        for (uint_fast8_t i = 0; i < n; i++) {
+        for (unsigned short i = 0; i < n; i++) {
             jobCanBeReleasedBefore[i] = false; // assumption for a start state
             processorAvailableForTau_i[i] = true;
             prevState_processorAvailableForTau_i[i] = true; // check this assumption !!!
@@ -65,10 +65,10 @@ struct state {
     
     // copy constructor
     state(const state& s) : n(s.n) {
-        c = new uint_fast8_t[n];
-        p = new uint_fast8_t[n];
-        timePassedFromLastRelease = new uint_fast8_t[n];
-        wrts = new uint_fast8_t[n];
+        c = new unsigned short[n];
+        p = new unsigned short[n];
+        timePassedFromLastRelease = new unsigned short[n];
+        wrts = new unsigned short[n];
         firstJobReleased = new bool[n];
         //releaseAtEarliest = new bool[n];
         
@@ -105,7 +105,7 @@ struct state {
     
     state& operator=(const state& s) {
         if(this != &s) {
-            for(uint_fast8_t i = 0; i < n; i++) {
+            for(unsigned short i = 0; i < n; i++) {
                 c[i] = s.c[i];
                 p[i] = s.p[i];
                 timePassedFromLastRelease[i] = s.timePassedFromLastRelease[i];
@@ -115,7 +115,7 @@ struct state {
                 jobCanBeReleasedBefore[i] = s.jobCanBeReleasedBefore[i];
             }
             
-            for (uint_fast8_t i = 0; i < n; i++) {
+            for (unsigned short i = 0; i < n; i++) {
                 processorAvailableForTau_i[i] = s.processorAvailableForTau_i[i];
                 prevState_processorAvailableForTau_i[i] = s.prevState_processorAvailableForTau_i[i];
             }
@@ -127,7 +127,7 @@ struct state {
             for (int i = 0; i < n; i++) tauI_jobJustCompleted[i] = s.tauI_jobJustCompleted[i];
             for (int i = 0; i < n; i++) tauI_releaseNextJobBefore[i] = s.tauI_releaseNextJobBefore[i];
 
-            for (uint_fast8_t i = 0; i < n-1; i++) interferred[i] = s.interferred[i];
+            for (unsigned short i = 0; i < n-1; i++) interferred[i] = s.interferred[i];
         }
         return *this;
     }
@@ -156,7 +156,7 @@ struct state {
         lockedJobsNum = 0;
         sumCs = 0;
         
-        for (uint_fast8_t i = 0; i < n; ++i) {
+        for (unsigned short i = 0; i < n; ++i) {
             if (p[i] > 0) {
                 lockedJobsNum++;
                 
@@ -217,7 +217,7 @@ struct state {
     
     
     // Time to next deadline of a task
-    inline int d(const uint_fast8_t i, const uint_fast8_t Pi, const uint_fast8_t Di) const {
+    inline int d(const unsigned short i, const unsigned short Pi, const unsigned short Di) const {
         return max(p[i] - (Pi - Di), 0);
     }
     
