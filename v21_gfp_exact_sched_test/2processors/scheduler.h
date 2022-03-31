@@ -1,1 +1,1 @@
-void sortTasksByPriorities(const state&, uint_fast8_t*);
+void sortTasksByPriorities(const state&, unsigned short*);
