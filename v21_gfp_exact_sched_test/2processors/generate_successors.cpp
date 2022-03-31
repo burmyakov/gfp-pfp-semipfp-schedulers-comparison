@@ -12,11 +12,11 @@ using namespace std;
 
 
 
-bool is_processor_available_to_tau_i(const state& s, const uint_fast8_t i, const uint_fast8_t m) {
+bool is_processor_available_to_tau_i(const state& s, const unsigned short i, const unsigned short m) {
     
-    uint_fast8_t hpJobsNum = 0;
+    unsigned short hpJobsNum = 0;
     
-    for (uint_fast8_t indx = 0; indx < i; indx++) {
+    for (unsigned short indx = 0; indx < i; indx++) {
         if (s.c[indx] > 0) {
             hpJobsNum++;
             if (hpJobsNum == m) return false;
@@ -35,18 +35,18 @@ bool is_processor_available_to_tau_i(const state& s, const uint_fast8_t i, const
 
 
 // Successors are not sorted
-void generate_successors(const TS& ts, state& s, const uint_fast8_t m, vector<state>* successors, uint_fast16_t& successorsNum) {
+void generate_successors(const TS& ts, state& s, const unsigned short m, vector<state>* successors, unsigned int& successorsNum) {
     
-    uint_fast16_t curSuccessorsNum;
+    unsigned int curSuccessorsNum;
     
     
     // Generate successor states
     (*successors)[0] = s;
     successorsNum = 1;
 
-    for (uint_fast8_t i = 0; i < ts.n; i++) {
+    for (unsigned short i = 0; i < ts.n; i++) {
         
-        for (uint_fast16_t successorItr = 0; successorItr < successorsNum; successorItr++) {
+        for (unsigned int successorItr = 0; successorItr < successorsNum; successorItr++) {
             (*successors)[successorItr].processorAvailableForTau_i[i] = is_processor_available_to_tau_i((*successors)[successorItr], i, m);
         }
         
@@ -57,7 +57,7 @@ void generate_successors(const TS& ts, state& s, const uint_fast8_t m, vector<st
             if ((i == (ts.n-1)) && (!s.prevState_processorAvailableForTau_i[i])) continue;
 
             curSuccessorsNum = successorsNum;
-            for (uint_fast16_t successorItr = 0; successorItr < curSuccessorsNum; successorItr++) {
+            for (unsigned int successorItr = 0; successorItr < curSuccessorsNum; successorItr++) {
                 
                 // Davis and Burns 2011 condition B for tau_k and any tau_i
                 // Check if it is necessary to release a job for tau_i at this state
@@ -136,14 +136,14 @@ void generate_successors(const TS& ts, state& s, const uint_fast8_t m, vector<st
     }
     
 
-    for (uint_fast16_t successorItr = 0; successorItr < successorsNum; successorItr++) {
+    for (unsigned int successorItr = 0; successorItr < successorsNum; successorItr++) {
         
         (*successors)[successorItr].updateCounters();
         
         // update bounds on WRTs (used later to order states for traversal)
         (*successors)[successorItr].wrts[ts.n-1] = (*successors)[successorItr].c[ts.n-1] + get_Iub_on_tau_n((*successors)[successorItr], ts, m);
         
-        for (uint_fast8_t j = 0; j < ts.n-1; j++) {
+        for (unsigned short j = 0; j < ts.n-1; j++) {
             (*successors)[successorItr].wrts[j] = get_response_time_UB((*successors)[successorItr], ts, j, m);
         }
     }

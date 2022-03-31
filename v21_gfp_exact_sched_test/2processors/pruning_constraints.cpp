@@ -11,13 +11,13 @@
 
 
 
-uint_fast8_t get_dt_resump(const state& s, const uint_fast8_t m) {
+unsigned short get_dt_resump(const state& s, const unsigned short m) {
 
-    uint_fast8_t* cs = new uint_fast8_t[s.n];
+    unsigned short* cs = new unsigned short[s.n];
     
     // assumption: at least m higher priority jobs at state s
-    uint_fast8_t n_hp = 0;
-    for (uint_fast8_t i = 0; i < s.n-1; i++) {
+    unsigned short n_hp = 0;
+    for (unsigned short i = 0; i < s.n-1; i++) {
         if (s.c[i] > 0) {
             cs[n_hp] = s.c[i];
             n_hp++;
@@ -25,7 +25,7 @@ uint_fast8_t get_dt_resump(const state& s, const uint_fast8_t m) {
     }
     sort(cs, cs + n_hp);
 
-    uint_fast8_t dtResump = cs[n_hp - m];
+    unsigned short dtResump = cs[n_hp - m];
     delete [] cs;
     
     return dtResump;
@@ -34,19 +34,19 @@ uint_fast8_t get_dt_resump(const state& s, const uint_fast8_t m) {
 
 
 
-uint_fast8_t get_dt_preempt(const state& s, const TS& ts, const uint_fast8_t i, const uint_fast8_t m) {
+unsigned short get_dt_preempt(const state& s, const TS& ts, const unsigned short i, const unsigned short m) {
 
     unsigned short* ps = new unsigned short[20];
-    uint_fast8_t dtPreempt;
+    unsigned short dtPreempt;
     
     if (i <= m) dtPreempt = ts.C[i];
     else {
-        uint_fast8_t n_hp_i = 0;
-        for (uint_fast8_t l = 0; l < i; l++) if (s.c[l] > 0) n_hp_i++;
+        unsigned short n_hp_i = 0;
+        for (unsigned short l = 0; l < i; l++) if (s.c[l] > 0) n_hp_i++;
     
         if (n_hp_i >= m) dtPreempt = 0;
         else { // i > m && n_hp[i] < m   -> tau_i gets a processor at state s
-            for (uint_fast8_t l = 0; l < i; l++) { if (s.p[l] > 0) ps[l] = s.p[l]; else ps[l] = 1; }
+            for (unsigned short l = 0; l < i; l++) { if (s.p[l] > 0) ps[l] = s.p[l]; else ps[l] = 1; }
             sort(ps, ps + (i-1));
 
             dtPreempt = ps[m - n_hp_i - 1];
@@ -66,13 +66,13 @@ uint_fast8_t get_dt_preempt(const state& s, const TS& ts, const uint_fast8_t i, 
 // Condition for a critical release instant of tau_i
 // when processor is available for tau_i
 // (the case when the next release of tau_i must occur only after tau_k is completed)
-bool conditionA_cri_tau_i(const state& s, const TS& ts, const uint_fast8_t m) {
+bool conditionA_cri_tau_i(const state& s, const TS& ts, const unsigned short m) {
     
     if (s.pendJobsNum <= m) {
-        uint_fast8_t N = s.n;
+        unsigned short N = s.n;
         
         if (s.c[N-1] > 0) {
-            for (uint_fast8_t i = 0; i < N-1; i++) {
+            for (unsigned short i = 0; i < N-1; i++) {
                 if (s.c[i] == ts.C[i]) { // tau_i job starts execution (as the number of pending jobs <= m)
                     if (s.p[i] >= s.d(N-1, ts.P[N-1], ts.D[N-1]) - 1 ) {
                         // to check if it is possible to put upper bound on the response time
@@ -82,8 +82,8 @@ bool conditionA_cri_tau_i(const state& s, const TS& ts, const uint_fast8_t m) {
             }
         } else {
             // the examined task has not released a job yet
-            uint_fast8_t length = get_max_remaining_schedule_length(s, ts, m);
-            for (uint_fast8_t i = 0; i < N-1; i++) {
+            unsigned short length = get_max_remaining_schedule_length(s, ts, m);
+            for (unsigned short i = 0; i < N-1; i++) {
                 if (s.c[i] == ts.C[i]) { // tau_i job starts execution (as the number of pending jobs <= m)
                     if (s.p[i] >= length - 1 ) {
                         // to check if it is possible to put upper bound on the response time
@@ -104,7 +104,7 @@ bool conditionA_cri_tau_i(const state& s, const TS& ts, const uint_fast8_t m) {
 
 // check generalized interference condition on tau_k:
 // task \tau_i must release a job, if that job would iterfere with a job of \tau_k for C_i time units
-bool conditionB_cri_tau_i(const state& s, const TS& ts, const uint_fast8_t m) {
+bool conditionB_cri_tau_i(const state& s, const TS& ts, const unsigned short m) {
     
     if (s.c[s.n-1] > 0) {
         
@@ -112,7 +112,7 @@ bool conditionB_cri_tau_i(const state& s, const TS& ts, const uint_fast8_t m) {
 
         if (s.pendJobsNum == m) { // to recheck if this condition is needed !!!
             
-            for (uint_fast8_t i = 0; i < s.n-1; i++) {
+            for (unsigned short i = 0; i < s.n-1; i++) {
                 
                 if (s.p[i] == 0) {
                     if (s.processorAvailableForTau_i[i]) {
@@ -121,8 +121,8 @@ bool conditionB_cri_tau_i(const state& s, const TS& ts, const uint_fast8_t m) {
                         s.c[i] = ts.C[i];
                         s.p[i] = ts.P[i];
 
-                        uint_fast8_t dt_resump_k = get_dt_resump(s, m); // assumption: m+1 pending jobs
-                        uint_fast8_t dt_preempt_i;
+                        unsigned short dt_resump_k = get_dt_resump(s, m); // assumption: m+1 pending jobs
+                        unsigned short dt_preempt_i;
                         if (dt_resump_k >= ts.C[i]) { // include case with c_k
                             
                             dt_preempt_i = get_dt_preempt(s, ts, i, m); // assumption: m+1 pending jobs
@@ -148,10 +148,10 @@ bool conditionB_cri_tau_i(const state& s, const TS& ts, const uint_fast8_t m) {
 
 
 // improved condition for cri2
-void conditionC_cri_tau_i(const state& s, const TS& ts, const uint_fast8_t m, const uint_fast8_t* perm) {
+void conditionC_cri_tau_i(const state& s, const TS& ts, const unsigned short m, const unsigned short* perm) {
     
     /*if (s.pendJobsNum <= m) { // no lower priority job is interfered at this time instant
-        for (uint_fast8_t i = 0; i < m; i++)
+        for (unsigned short i = 0; i < m; i++)
             if (s.c[perm[i]] == ts.C[perm[i]]) // job starts execution
                 s.releaseAtEarliest[perm[i]] = true;
     }*/
@@ -164,9 +164,9 @@ void conditionC_cri_tau_i(const state& s, const TS& ts, const uint_fast8_t m, co
 
 
 
-bool condition_job_interference(const state& s, const uint_fast8_t m, const uint_fast8_t& dt, const uint_fast8_t* perm) {
+bool condition_job_interference(const state& s, const unsigned short m, const unsigned short& dt, const unsigned short* perm) {
 
-    for (uint_fast8_t i = 0; i < m; i++)
+    for (unsigned short i = 0; i < m; i++)
         if ((s.c[perm[i]] > 0) && (s.c[perm[i]] <= dt))
             if (!s.interferred[perm[i]])
                 return false;
@@ -181,7 +181,7 @@ bool condition_job_interference(const state& s, const uint_fast8_t m, const uint
 
 
 
-bool condition_cri_2(const state& s, const uint_fast8_t m, const uint_fast8_t i, const bool processorAvailableToTauI) {
+bool condition_cri_2(const state& s, const unsigned short m, const unsigned short i, const bool processorAvailableToTauI) {
     
     if ((i == s.n-1) && (processorAvailableToTauI)) return false; // assumption: tau_n can release a job only once
     else if (i >= m) {
@@ -200,12 +200,12 @@ bool condition_cri_2(const state& s, const uint_fast8_t m, const uint_fast8_t i,
 
 
 // Necessary condition of interference at the last execution slot of a job, with a lower priority job
-bool condition_of_interference_at_job_completion(const state& s, const uint_fast8_t m){
+bool condition_of_interference_at_job_completion(const state& s, const unsigned short m){
     
     bool conditionOnInterferenceAtCompletionHolds = true;
     
     if (s.pendJobsNum <= m) {
-        for (uint_fast8_t j = 0; j < s.n-1; j++) {
+        for (unsigned short j = 0; j < s.n-1; j++) {
             if (s.c[j] == 1) { // job will complete execution by the next time instant
                 if (s.jobCanBeReleasedBefore[j]) {
                     // job could be released before
@@ -236,14 +236,14 @@ bool condition_of_interference_at_job_completion(const state& s, const uint_fast
 // but none of them does, can be discarded
 bool condition_for_releases_of_hp_jobs(const state& s){
     
-    /*const uint_fast8_t m = 3;
+    /*const unsigned short m = 3;
     
     if (s.c[s.tsLocal.n-1] == 0) return true;
     else {
     
         bool jobJustReleased = false;
     
-        for (uint_fast8_t i = 0; i < s.tsLocal.n-1; i++) {
+        for (unsigned short i = 0; i < s.tsLocal.n-1; i++) {
             if ((s.p[i] > 0) && (s.p[i] < s.tsLocal.P[i]))
                 return true;
         
@@ -259,7 +259,7 @@ bool condition_for_releases_of_hp_jobs(const state& s){
     }*/
     
     if (s.c[s.n-1] > 0) {
-        for (uint_fast8_t i = 0; i < s.n-1; i++)
+        for (unsigned short i = 0; i < s.n-1; i++)
             if (s.p[i] > 0) return true;
         
         return false;
@@ -275,7 +275,7 @@ bool condition_for_releases_of_hp_jobs(const state& s){
 
 void condition_on_next_release_instants(state& s, const TS& ts) {
     
-    for (uint_fast8_t i = 0; i < ts.n; i++) {
+    for (unsigned short i = 0; i < ts.n; i++) {
         if (s.tauI_jobJustCompleted[i]) { // to update the condition
             
             // tau_i has just completed execution;
@@ -311,10 +311,10 @@ void condition_on_next_release_instants(state& s, const TS& ts) {
 
 
 // returns true, if necessary condition holds
-bool condition_necessary_unsched(const state& s, const TS& ts, const uint_fast8_t m){
+bool condition_necessary_unsched(const state& s, const TS& ts, const unsigned short m){
     
-    uint_fast8_t Iub = 0;
-    uint_fast8_t N = s.n;
+    unsigned short Iub = 0;
+    unsigned short N = s.n;
     
     if (s.c[s.n-1] > 0) {
         // an examined task has released its job

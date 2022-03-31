@@ -6,11 +6,11 @@
 
 
 
-bool is_processor_available_to_tau_i_dt(const state& s, const uint_fast8_t i, const uint_fast8_t m) {
+bool is_processor_available_to_tau_i_dt(const state& s, const unsigned short i, const unsigned short m) {
     
-    uint_fast8_t hpJobsNum = 0;
+    unsigned short hpJobsNum = 0;
     
-    for (uint_fast8_t indx = 0; indx < i; indx++) {
+    for (unsigned short indx = 0; indx < i; indx++) {
         if (s.c[indx] > 0) {
             hpJobsNum++;
             if (hpJobsNum == m) return false;
@@ -23,11 +23,11 @@ bool is_processor_available_to_tau_i_dt(const state& s, const uint_fast8_t i, co
 
 
 
-uint_fast8_t get_dt_to_next_completion(const state& s, const uint_fast8_t m, const uint_fast8_t *perm){
+unsigned short get_dt_to_next_completion(const state& s, const unsigned short m, const unsigned short *perm){
 
-    uint_fast8_t dtToNextCompletion = 255;
+    unsigned short dtToNextCompletion = 255;
     
-    for (uint_fast8_t i = 0; i < m; i++) {
+    for (unsigned short i = 0; i < m; i++) {
         if (s.c[perm[i]] == 1) {dtToNextCompletion = 1; break;}
         else if (s.c[perm[i]] > 1) dtToNextCompletion = min((int)dtToNextCompletion, (int)(s.c[perm[i]]));
     }
@@ -38,13 +38,13 @@ uint_fast8_t get_dt_to_next_completion(const state& s, const uint_fast8_t m, con
 
 
 
-uint_fast8_t get_dt_processor_available_to_tau_i(const state& s, const uint_fast8_t m, const uint_fast8_t taskIndx) {
+unsigned short get_dt_processor_available_to_tau_i(const state& s, const unsigned short m, const unsigned short taskIndx) {
 
-    uint_fast8_t* cs = new uint_fast8_t[s.n];
+    unsigned short* cs = new unsigned short[s.n];
     
     // assumption: at least m higher priority jobs at state s
-    uint_fast8_t n_hp = 0;
-    for (uint_fast8_t i = 0; i < taskIndx; i++) {
+    unsigned short n_hp = 0;
+    for (unsigned short i = 0; i < taskIndx; i++) {
         if (s.c[i] > 0) {
             cs[n_hp] = s.c[i];
             n_hp++;
@@ -52,7 +52,7 @@ uint_fast8_t get_dt_processor_available_to_tau_i(const state& s, const uint_fast
     }
     sort(cs, cs + n_hp);
 
-    uint_fast8_t dtResump = cs[n_hp - m + 1];
+    unsigned short dtResump = cs[n_hp - m + 1];
     delete [] cs;
     
     return dtResump;
@@ -62,12 +62,12 @@ uint_fast8_t get_dt_processor_available_to_tau_i(const state& s, const uint_fast
 
 
 
-uint_fast8_t get_dt_to_next_release(const state& s, const uint_fast8_t m){
+unsigned short get_dt_to_next_release(const state& s, const unsigned short m){
     
-    uint_fast8_t dtToNextRelease = max(1, (int)(s.p[0]));
+    unsigned short dtToNextRelease = max(1, (int)(s.p[0]));
     if (dtToNextRelease == 1) return dtToNextRelease;
     
-    uint_fast8_t dtToTimeWithLessThanMHPjobs;
+    unsigned short dtToTimeWithLessThanMHPjobs;
     for (unsigned short i = 1; i <= s.n-1; i++) {
         
         if (i < m) {
@@ -107,13 +107,13 @@ uint_fast8_t get_dt_to_next_release(const state& s, const uint_fast8_t m){
 
 
 
-uint_fast8_t deltaT(const state& s, const uint_fast8_t m, const uint_fast8_t *perm) {
+unsigned short deltaT(const state& s, const unsigned short m, const unsigned short *perm) {
     
-    uint_fast8_t dtToNextCompletion = get_dt_to_next_completion(s, m, perm);
+    unsigned short dtToNextCompletion = get_dt_to_next_completion(s, m, perm);
     
     if (dtToNextCompletion == 1) return dtToNextCompletion;
     else {
-        uint_fast8_t dtToNextRelease = get_dt_to_next_release(s, m);
+        unsigned short dtToNextRelease = get_dt_to_next_release(s, m);
         return min((int)dtToNextRelease, (int)dtToNextCompletion);
     }
 }

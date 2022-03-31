@@ -1,1 +1,1 @@
-short int algorithm_move(state&, const TS&, const uint_fast8_t, bool);
+short int algorithm_move(state&, const TS&, const unsigned short, bool);

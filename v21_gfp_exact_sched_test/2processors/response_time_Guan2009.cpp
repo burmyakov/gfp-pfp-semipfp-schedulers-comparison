@@ -13,12 +13,12 @@
 
 using namespace std;
 
-const uint_fast8_t NMAX = 16;
-uint_fast8_t Rs[NMAX];
-uint_fast16_t Is_NC[NMAX];
-uint_fast16_t Is_CI[NMAX];
-uint_fast16_t Is_DIFF[NMAX];
-uint_fast16_t Is_DIFF_SORTED[NMAX];
+const unsigned short NMAX = 16;
+unsigned short Rs[NMAX];
+unsigned int Is_NC[NMAX];
+unsigned int Is_CI[NMAX];
+unsigned int Is_DIFF[NMAX];
+unsigned int Is_DIFF_SORTED[NMAX];
 
 
 
@@ -151,11 +151,11 @@ void get_Rk(const TS& ts, const unsigned short m, const unsigned short k, unsign
 
 
 
-uint_fast16_t get_Wi_NC(uint_fast8_t i, uint_fast8_t Rk, uint_fast8_t Cs[NMAX], uint_fast8_t Ps[NMAX]) {
-    uint_fast16_t Wi_NC = 0;
-    uint_fast16_t Ni_NC = Rk/Ps[i];
+unsigned int get_Wi_NC(unsigned short i, unsigned short Rk, unsigned short Cs[NMAX], unsigned short Ps[NMAX]) {
+    unsigned int Wi_NC = 0;
+    unsigned int Ni_NC = Rk/Ps[i];
     
-    Wi_NC = Ni_NC*Cs[i] + min((int)Cs[i], (int)Rk - Ni_NC*Ps[i]);
+    Wi_NC = Ni_NC*Cs[i] + min((int)Cs[i], (int)Rk - (int)Ni_NC*Ps[i]);
     Wi_NC = max(0, (int)Wi_NC);
     
     //cout << "Wi_NC[" << i << "]: " << Wi_NC << endl;
@@ -164,10 +164,10 @@ uint_fast16_t get_Wi_NC(uint_fast8_t i, uint_fast8_t Rk, uint_fast8_t Cs[NMAX], 
 }
 
 
-void get_Is_NC(uint_fast8_t k, uint_fast8_t Rk, uint_fast8_t Cs[NMAX], uint_fast8_t Ps[NMAX]) {
+void get_Is_NC(unsigned short k, unsigned short Rk, unsigned short Cs[NMAX], unsigned short Ps[NMAX]) {
     
-    for (uint_fast8_t i = 0; i < k; i++) {
-        uint_fast16_t Wi_NC = get_Wi_NC(i, Rk, Cs, Ps);
+    for (unsigned short i = 0; i < k; i++) {
+        unsigned int Wi_NC = get_Wi_NC(i, Rk, Cs, Ps);
         Is_NC[i] = max(0, min((int)Wi_NC, (int)Rk - Cs[k] + 1));
         //cout << "Wi_NC[" << i << "]:" << Wi_NC << ", Is_NC[" << i << "]:" << Is_NC[i] << endl;
     }
@@ -176,12 +176,12 @@ void get_Is_NC(uint_fast8_t k, uint_fast8_t Rk, uint_fast8_t Cs[NMAX], uint_fast
 
 
 
-uint_fast16_t get_Wi_CI(uint_fast8_t i, uint_fast8_t Rk, uint_fast8_t Cs[NMAX], uint_fast8_t Ps[NMAX], uint_fast8_t* rtGuan2009) {
+unsigned int get_Wi_CI(unsigned short i, unsigned short Rk, unsigned short Cs[NMAX], unsigned short Ps[NMAX], unsigned short* rtGuan2009) {
     
-    uint_fast16_t Wi_CI = 0;
-    uint_fast16_t Ni_CI = (Rk + rtGuan2009[i] - Cs[i])/Ps[i];
+    unsigned int Wi_CI = 0;
+    unsigned int Ni_CI = (Rk + rtGuan2009[i] - Cs[i])/Ps[i];
     
-    Wi_CI = Ni_CI*Cs[i] + min((int)Cs[i], (int)Rk + rtGuan2009[i] - Cs[i] - Ni_CI*Ps[i]);
+    Wi_CI = Ni_CI*Cs[i] + min((int)Cs[i], (int)Rk + (int)rtGuan2009[i] - (int)Cs[i] - (int)Ni_CI*Ps[i]);
     Wi_CI = max(0, (int)Wi_CI);
     
     //cout << "Wi_CI[" << i << "]: " << Wi_CI << endl;
@@ -192,7 +192,7 @@ uint_fast16_t get_Wi_CI(uint_fast8_t i, uint_fast8_t Rk, uint_fast8_t Cs[NMAX], 
 
 
 
-void get_Is_CI(uint_fast8_t k, uint_fast8_t Rk, uint_fast8_t Cs[NMAX], uint_fast8_t Ps[NMAX], uint_fast8_t* rtGuan2009) {
+void get_Is_CI(unsigned short k, unsigned short Rk, unsigned short Cs[NMAX], unsigned short Ps[NMAX], unsigned short* rtGuan2009) {
     
     for (int i = 0; i < k; i++) {
         int Wi_CI = get_Wi_CI(i, Rk, Cs, Ps, rtGuan2009);
@@ -207,7 +207,7 @@ void get_Is_CI(uint_fast8_t k, uint_fast8_t Rk, uint_fast8_t Cs[NMAX], uint_fast
 
 void get_Is_DIFF(int k) {
     //cout << "Is_DIFF before sorting:" << endl;
-    for (uint_fast8_t i = 0; i < k; i++) {
+    for (unsigned short i = 0; i < k; i++) {
         Is_DIFF[i] = Is_CI[i] - Is_NC[i];
         //cout << "Is_DIFF[" << i << "]:" << Is_DIFF[i] << endl;
     }
@@ -236,12 +236,12 @@ void get_Is_DIFF(int k) {
 
 
 
-uint_fast8_t get_omega(uint_fast8_t m, uint_fast8_t k, uint_fast8_t Rk, uint_fast8_t Cs[NMAX], uint_fast8_t Ps[NMAX], uint_fast8_t* rtGuan2009) {
+unsigned short get_omega(unsigned short m, unsigned short k, unsigned short Rk, unsigned short Cs[NMAX], unsigned short Ps[NMAX], unsigned short* rtGuan2009) {
     
-    uint_fast8_t Omega = 0;
-    uint_fast16_t terms = 0;
-    uint_fast16_t term1 = 0;
-    uint_fast16_t term2 = 0;
+    unsigned short Omega = 0;
+    unsigned int terms = 0;
+    unsigned int term1 = 0;
+    unsigned int term2 = 0;
     
     get_Is_NC(k, Rk, Cs, Ps);
     get_Is_CI(k, Rk, Cs, Ps, rtGuan2009);
@@ -264,15 +264,15 @@ uint_fast8_t get_omega(uint_fast8_t m, uint_fast8_t k, uint_fast8_t Rk, uint_fas
 
 
 
-void get_Rk(uint_fast8_t m, uint_fast8_t k, uint_fast8_t Cs[NMAX], uint_fast8_t Ps[NMAX], uint_fast8_t* rtGuan2009) {
+void get_Rk(unsigned short m, unsigned short k, unsigned short Cs[NMAX], unsigned short Ps[NMAX], unsigned short* rtGuan2009) {
     
     if (k < m) {
         rtGuan2009[k] = Cs[k];
         return;
     }
     
-    uint_fast8_t Rk = 0;
-    uint_fast8_t Omega = Cs[k];
+    unsigned short Rk = 0;
+    unsigned short Omega = Cs[k];
     
     while (Rk != Omega) {
         Rk = Omega;
@@ -293,18 +293,18 @@ void get_Rk(uint_fast8_t m, uint_fast8_t k, uint_fast8_t Cs[NMAX], uint_fast8_t 
 
 
 
-uint_fast8_t* response_time_Guan2009(const TS& ts, const uint_fast8_t m) {
+unsigned short* response_time_Guan2009(const TS& ts, const unsigned short m) {
 
-    uint_fast8_t* rtGuan2009 = new uint_fast8_t[ts.n];
-    uint_fast8_t* Cs = new uint_fast8_t[ts.n];
-    uint_fast8_t* Ps = new uint_fast8_t[ts.n];
+    unsigned short* rtGuan2009 = new unsigned short[ts.n];
+    unsigned short* Cs = new unsigned short[ts.n];
+    unsigned short* Ps = new unsigned short[ts.n];
     
-    for (uint_fast8_t k = 0; k < ts.n; k++) {
+    for (unsigned short k = 0; k < ts.n; k++) {
         Cs[k] = ts.C[k];
         Ps[k] = ts.P[k];
     }
     
-    for (uint_fast8_t k = 0; k < ts.n; k++) {
+    for (unsigned short k = 0; k < ts.n; k++) {
         //get_Rk(ts, m, k, rtGuan2009);
         get_Rk(m, k, Cs, Ps, rtGuan2009);
     }
