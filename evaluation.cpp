@@ -153,13 +153,12 @@ tuple<bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, unsigned int, 
 int main(){
     
     TS ts;
-    int m(0);
+    int m(2);
     int n(0);
     bool verbose(false);
     
     
-    cerr << "Number of processors? " << endl;
-    cin >> m;
+    cerr << "The version for 2 processors" << endl;
     cerr << "Number of tasks? " << endl;
     cin >> n;
     ts.n = n;
