@@ -166,10 +166,6 @@ int main(){
     
     for (unsigned short i = 0; i < n; i++) {
         int Ci, Di, Pi;
-        /*fileTaskSets >> Ci;
-        fileTaskSets >> Di;
-        fileTaskSets >> Pi;*/
-        //cout << "i: " << i << ", Ci: " << Ci << ", Di: " << Di << ", Pi: " << Pi << endl;
         cout << "C[" << i << "] ?" << endl;
         cin >> Ci;
         cout << "D[" << i << "] ?" << endl;
